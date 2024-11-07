@@ -1,5 +1,4 @@
-// src/App.jsx
-import { useMemo, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { 
   Container, 
   Grid, 
@@ -38,6 +37,9 @@ const PatentCatalog = () => {
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
+  const paginatedPatentsRef = useRef([]);
+  const totalPagesRef = useRef(0);
+
   // Fetch patents when search query changes
   useEffect(() => {
     const getPatents = async () => {
@@ -59,21 +61,17 @@ const PatentCatalog = () => {
     getPatents();
   }, [debouncedSearchQuery]);
 
-  // Filter and paginate patents
-  const paginatedPatents = useMemo(() => {
+  useEffect(() => {
     const filtered = patents.filter(patent => 
       patent.patent_title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const start = (page - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
-    
-    return filtered.slice(start, end);
-  }, [patents, searchQuery, page]);
+    paginatedPatentsRef.current = filtered.slice(start, end);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(patents.length / ITEMS_PER_PAGE);
-  }, [patents]);
+    totalPagesRef.current = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  }, [patents, searchQuery, page]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -90,7 +88,7 @@ const PatentCatalog = () => {
         </Toolbar>
       </AppBar>
       
-      <Toolbar /> {/* Spacer for fixed AppBar */}
+      <Toolbar /> 
 
       <Container sx={{ py: 4, flex: 1 }}>
         <SearchBar />
@@ -106,7 +104,7 @@ const PatentCatalog = () => {
         ) : (
           <>
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              {paginatedPatents.map((patent) => (
+              {paginatedPatentsRef.current.map((patent) => (
                 <Grid item xs={12} sm={6} md={4} key={patent.patent_id}>
                   <PatentCard 
                     patent={patent} 
@@ -116,10 +114,10 @@ const PatentCatalog = () => {
               ))}
             </Grid>
 
-            {paginatedPatents.length > 0 ? (
+            {paginatedPatentsRef.current.length > 0 ? (
               <Stack spacing={2} alignItems="center">
                 <Pagination 
-                  count={totalPages}
+                  count={totalPagesRef.current}
                   page={page}
                   onChange={handlePageChange}
                   color="primary"
