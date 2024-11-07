@@ -60,7 +60,7 @@ const PatentCatalog = () => {
   }, [debouncedSearchQuery]);
 
   // Filter and paginate patents
-  const { paginatedPatents, totalPages } = useMemo(() => {
+  const paginatedPatents = useMemo(() => {
     const filtered = patents.filter(patent => 
       patent.patent_title.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -68,11 +68,12 @@ const PatentCatalog = () => {
     const start = (page - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
     
-    return {
-      paginatedPatents: filtered.slice(start, end),
-      totalPages: Math.ceil(filtered.length / ITEMS_PER_PAGE)
-    };
+    return filtered.slice(start, end);
   }, [patents, searchQuery, page]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(patents.length / ITEMS_PER_PAGE);
+  }, [patents]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -153,7 +154,6 @@ const PatentCatalog = () => {
   );
 };
 
-// Context também precisa ser atualizado para incluir as novas funcionalidades
 const App = () => {
   return (
     <PatentProvider>
