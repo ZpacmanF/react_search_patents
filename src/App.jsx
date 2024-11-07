@@ -1,35 +1,165 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import { useMemo, useEffect } from 'react';
+import { 
+  Container, 
+  Grid, 
+  AppBar, 
+  Typography, 
+  Box, 
+  Alert,
+  Toolbar,
+  Pagination,
+  Stack
+} from '@mui/material';
+import { PatentProvider, usePatentContext } from './context/PatentContext';
+import SearchBar from './components/SearchBar';
+import PatentCard from './components/PatentCard';
+import PatentModal from './components/PatentModal';
+import LoadingSpinner from './components/LoadingSpinner';
+import { fetchPatents } from './services/patentAPI';
+import { useDebounce } from './hooks/useDebounce';
 
-function App() {
-  const [count, setCount] = useState(0)
+const ITEMS_PER_PAGE = 12;
+
+const PatentCatalog = () => {
+  const { 
+    patents, 
+    setPatents,
+    loading, 
+    setLoading,
+    error, 
+    setError,
+    searchQuery,
+    page,
+    setPage,
+    selectedPatent,
+    setSelectedPatent
+  } = usePatentContext();
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  // Fetch patents when search query changes
+  useEffect(() => {
+    const getPatents = async () => {
+      if (debouncedSearchQuery.length === 0 || debouncedSearchQuery.length >= 3) {
+        setLoading(true);
+        setError(null);
+        try {
+          const data = await fetchPatents(debouncedSearchQuery);
+          setPatents(data);
+          setPage(1); // Reset to first page on new search
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    getPatents();
+  }, [debouncedSearchQuery]);
+
+  // Filter and paginate patents
+  const { paginatedPatents, totalPages } = useMemo(() => {
+    const filtered = patents.filter(patent => 
+      patent.patent_title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    
+    return {
+      paginatedPatents: filtered.slice(start, end),
+      totalPages: Math.ceil(filtered.length / ITEMS_PER_PAGE)
+    };
+  }, [patents, searchQuery, page]);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Catálogo de Patentes
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      
+      <Toolbar /> {/* Spacer for fixed AppBar */}
 
-export default App
+      <Container sx={{ py: 4, flex: 1 }}>
+        <SearchBar />
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {paginatedPatents.map((patent) => (
+                <Grid item xs={12} sm={6} md={4} key={patent.patent_id}>
+                  <PatentCard 
+                    patent={patent} 
+                    onClick={() => setSelectedPatent(patent)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+
+            {paginatedPatents.length > 0 ? (
+              <Stack spacing={2} alignItems="center">
+                <Pagination 
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                />
+              </Stack>
+            ) : (
+              <Box textAlign="center" py={4}>
+                <Typography variant="h6" color="text.secondary">
+                  Nenhuma patente encontrada
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
+
+        <PatentModal 
+          patent={selectedPatent}
+          open={Boolean(selectedPatent)}
+          onClose={() => setSelectedPatent(null)}
+        />
+      </Container>
+
+      <Box component="footer" sx={{ py: 3, bgcolor: 'background.paper' }}>
+        <Container>
+          <Typography variant="body2" color="text.secondary" align="center">
+            © 2024 Catálogo de Patentes
+          </Typography>
+        </Container>
+      </Box>
+    </Box>
+  );
+};
+
+// Context também precisa ser atualizado para incluir as novas funcionalidades
+const App = () => {
+  return (
+    <PatentProvider>
+      <PatentCatalog />
+    </PatentProvider>
+  );
+};
+
+export default App;
