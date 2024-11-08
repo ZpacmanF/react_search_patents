@@ -20,6 +20,7 @@ import { useDebounce } from './hooks/useDebounce';
 
 const ITEMS_PER_PAGE = 12;
 
+
 const PatentCatalog = () => {
   const { 
     patents, 
