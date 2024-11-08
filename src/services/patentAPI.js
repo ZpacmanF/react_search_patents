@@ -1,7 +1,6 @@
 const BASE_URL = 'https://api.patentsview.org/patents/query';
 
 export const fetchPatents = async (query = '') => {
-  // Configuração padrão para buscar todos os dados se não houver uma query específica
   const defaultQuery = {
     q: query ? { "_text_any": { "patent_title": query } } : { "_gte": { "patent_date": "2000-01-01" } },
     f: [
