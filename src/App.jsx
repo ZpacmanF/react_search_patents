@@ -41,7 +41,7 @@ const PatentCatalog = () => {
   const paginatedPatentsRef = useRef([]);
   const totalPagesRef = useRef(0);
 
-  // Fetch patents when search query changes
+
   useEffect(() => {
     const getPatents = async () => {
       if (debouncedSearchQuery.length === 0 || debouncedSearchQuery.length >= 3) {
@@ -50,7 +50,7 @@ const PatentCatalog = () => {
         try {
           const data = await fetchPatents(debouncedSearchQuery);
           setPatents(data);
-          setPage(1); // Reset to first page on new search
+          setPage(1);
         } catch (err) {
           setError(err.message);
         } finally {
@@ -81,13 +81,15 @@ const PatentCatalog = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Catálogo de Patentes
-          </Typography>
-        </Toolbar>
-      </AppBar>
+<AppBar position="fixed">
+  <Toolbar>
+    <Box sx={{ flexGrow: 1 }} />
+    <Typography variant="h6" component="div" sx={{ flexGrow: 0, textAlign: 'center' }}>
+      Patent Catalog
+    </Typography>
+    <Box sx={{ flexGrow: 1 }} />
+  </Toolbar>
+</AppBar>
       
       <Toolbar /> 
 
@@ -128,7 +130,7 @@ const PatentCatalog = () => {
             ) : (
               <Box textAlign="center" py={4}>
                 <Typography variant="h6" color="text.secondary">
-                  Nenhuma patente encontrada
+                  None Patent Found
                 </Typography>
               </Box>
             )}
@@ -145,7 +147,7 @@ const PatentCatalog = () => {
       <Box component="footer" sx={{ py: 3, bgcolor: 'background.paper' }}>
         <Container>
           <Typography variant="body2" color="text.secondary" align="center">
-            © 2024 Catálogo de Patentes
+            © 2024 Patent Catalog
           </Typography>
         </Container>
       </Box>
