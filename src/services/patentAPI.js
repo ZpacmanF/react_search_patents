@@ -29,10 +29,9 @@ export const fetchPatents = async (query = '') => {
       body: JSON.stringify(defaultQuery),
     });
 
-    if (!response.ok) throw new Error('Falha ao buscar patentes');
+    if (!response.ok) throw new Error('Error finding patents');
     
     const data = await response.json();
-    console.log('Dados da API:', data);
     return data.patents || [];
   } catch (error) {
     throw new Error(error.message);

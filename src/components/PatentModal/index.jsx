@@ -5,7 +5,7 @@ const PatentModal = ({ patent, open, onClose }) => {
   if (!patent) return null;
 
   const getInventorNames = (inventors) => {
-    return inventors.map(inv => `${inv.inventor_first_name} ${inv.inventor_last_name}`).join(', ') || 'Não disponível';
+    return inventors.map(inv => `${inv.inventor_first_name} ${inv.inventor_last_name}`).join(', ') || 'Not Found';
   };
 
   return (
@@ -20,26 +20,26 @@ const PatentModal = ({ patent, open, onClose }) => {
         </Typography>
         
         <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>ID da Patente</Typography>
+          <Typography sx={modalStyles.label}>Patent ID</Typography>
           <Typography>{patent.patent_id}</Typography>
         </Box>
         
         <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Data</Typography>
+          <Typography sx={modalStyles.label}>Date</Typography>
           <Typography>{patent.patent_date}</Typography>
         </Box>
 
         <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Inventores</Typography>
+          <Typography sx={modalStyles.label}>Inventors</Typography>
           <Typography>
             {getInventorNames(patent.inventors)}
           </Typography>
         </Box>
 
         <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Resumo</Typography>
+          <Typography sx={modalStyles.label}>Abstract</Typography>
           <Typography>
-            {patent.patent_abstract || 'Resumo não disponível'}
+            {patent.patent_abstract || 'Abstract not available'}
           </Typography>
         </Box>
       </Box>
