@@ -20,7 +20,6 @@ import { useDebounce } from './hooks/useDebounce';
 
 const ITEMS_PER_PAGE = 12;
 
-
 const PatentCatalog = () => {
   const { 
     patents, 
@@ -41,7 +40,6 @@ const PatentCatalog = () => {
   const paginatedPatentsRef = useRef([]);
   const totalPagesRef = useRef(0);
 
-
   useEffect(() => {
     const getPatents = async () => {
       if (debouncedSearchQuery.length === 0 || debouncedSearchQuery.length >= 3) {
@@ -50,7 +48,7 @@ const PatentCatalog = () => {
         try {
           const data = await fetchPatents(debouncedSearchQuery);
           setPatents(data);
-          setPage(1);
+          setPage(1); // Reset the page on search change
         } catch (err) {
           setError(err.message);
         } finally {
@@ -60,11 +58,11 @@ const PatentCatalog = () => {
     };
 
     getPatents();
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, setLoading, setError, setPatents, setPage]);
 
   useEffect(() => {
     const filtered = patents.filter(patent => 
-      patent.patent_title.toLowerCase().includes(searchQuery.toLowerCase())
+      patent.patent_title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
 
     const start = (page - 1) * ITEMS_PER_PAGE;
@@ -72,7 +70,7 @@ const PatentCatalog = () => {
     paginatedPatentsRef.current = filtered.slice(start, end);
 
     totalPagesRef.current = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  }, [patents, searchQuery, page]);
+  }, [patents, debouncedSearchQuery, page]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -80,20 +78,20 @@ const PatentCatalog = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-<AppBar position="fixed">
-  <Toolbar>
-    <Box sx={{ flexGrow: 1 }} />
-    <Typography variant="h6" component="div" sx={{ flexGrow: 0, textAlign: 'center' }}>
-      Patent Catalog
-    </Typography>
-    <Box sx={{ flexGrow: 1 }} />
-  </Toolbar>
-</AppBar>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Box sx={{ flexGrow: 1 }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 0, textAlign: 'center' }}>
+            Patent Catalog
+          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+        </Toolbar>
+      </AppBar>
       
       <Toolbar /> 
 
-      <Container sx={{ py: 4, flex: 1 }}>
+      <Container maxWidth={false} sx={{ py: 4, flex: 1, width: '100%' }}>
         <SearchBar />
 
         {error && (
@@ -102,40 +100,42 @@ const PatentCatalog = () => {
           </Alert>
         )}
 
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              {paginatedPatentsRef.current.map((patent) => (
-                <Grid item xs={12} sm={6} md={4} key={patent.patent_id}>
-                  <PatentCard 
-                    patent={patent} 
-                    onClick={() => setSelectedPatent(patent)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
+        <Box sx={{ minHeight: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                {paginatedPatentsRef.current.map((patent) => (
+                  <Grid item xs={12} sm={6} md={4} key={patent.patent_id}>
+                    <PatentCard 
+                      patent={patent} 
+                      onClick={() => setSelectedPatent(patent)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
 
-            {paginatedPatentsRef.current.length > 0 ? (
-              <Stack spacing={2} alignItems="center">
-                <Pagination 
-                  count={totalPagesRef.current}
-                  page={page}
-                  onChange={handlePageChange}
-                  color="primary"
-                  size="large"
-                />
-              </Stack>
-            ) : (
-              <Box textAlign="center" py={4}>
-                <Typography variant="h6" color="text.secondary">
-                  None Patent Found
-                </Typography>
-              </Box>
-            )}
-          </>
-        )}
+              {paginatedPatentsRef.current.length > 0 ? (
+                <Stack spacing={2} alignItems="center">
+                  <Pagination 
+                    count={totalPagesRef.current}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    size="large"
+                  />
+                </Stack>
+              ) : (
+                <Box textAlign="center" py={4}>
+                  <Typography variant="h6" color="text.secondary">
+                    No Patents Found
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+        </Box>
 
         <PatentModal 
           patent={selectedPatent}
@@ -144,8 +144,8 @@ const PatentCatalog = () => {
         />
       </Container>
 
-      <Box component="footer" sx={{ py: 3, bgcolor: 'background.paper' }}>
-        <Container>
+      <Box component="footer" sx={{ py: 3, bgcolor: 'background.paper', width: '100%' }}>
+        <Container maxWidth="lg">
           <Typography variant="body2" color="text.secondary" align="center">
             © 2024 Patent Catalog
           </Typography>
