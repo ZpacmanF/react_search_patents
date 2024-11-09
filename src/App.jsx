@@ -60,16 +60,18 @@ const PatentCatalog = () => {
   }, [debouncedSearchQuery, setLoading, setError, setPatents, setPage]);
 
   useEffect(() => {
-    const filtered = patents.filter(patent => 
-      patent.patent_title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-    );
+    if (patents.length > 0) {
+        const filtered = patents.filter(patent => 
+            patent.patent_title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+        );
 
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    paginatedPatentsRef.current = filtered.slice(start, end);
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        paginatedPatentsRef.current = filtered.slice(start, end);
 
-    totalPagesRef.current = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  }, [patents, debouncedSearchQuery, page]);
+        totalPagesRef.current = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    }
+}, [patents, debouncedSearchQuery, page]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
