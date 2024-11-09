@@ -21,7 +21,7 @@ const SearchBar = () => {
       error={searchQuery.length > 0 && searchQuery.length < 3}
       helperText={
         searchQuery.length > 0 && searchQuery.length < 3 
-          ? "Digite pelo menos 3 caracteres" 
+          ? "Please enter at least 3 characters" 
           : ""
       }
     />
