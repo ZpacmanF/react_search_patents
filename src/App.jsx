@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { 
   Container, 
-  Grid, 
   AppBar, 
   Typography, 
   Box, 
@@ -48,7 +47,7 @@ const PatentCatalog = () => {
         try {
           const data = await fetchPatents(debouncedSearchQuery);
           setPatents(data);
-          setPage(1); // Reset the page on search change
+          setPage(1);
         } catch (err) {
           setError(err.message);
         } finally {
@@ -105,16 +104,16 @@ const PatentCatalog = () => {
             <LoadingSpinner />
           ) : (
             <>
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                {paginatedPatentsRef.current.map((patent) => (
-                  <Grid item xs={12} sm={6} md={4} key={patent.patent_id}>
-                    <PatentCard 
-                      patent={patent} 
-                      onClick={() => setSelectedPatent(patent)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3 }}>
+              {paginatedPatentsRef.current.map((patent) => (
+                <Box key={patent.patent_id}>
+                  <PatentCard 
+                    patent={patent} 
+                    onClick={() => setSelectedPatent(patent)}
+                  />
+                </Box>
+              ))}
+            </Box>
 
               {paginatedPatentsRef.current.length > 0 ? (
                 <Stack spacing={2} alignItems="center">
