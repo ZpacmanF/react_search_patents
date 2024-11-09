@@ -41,22 +41,22 @@ const PatentCatalog = () => {
 
   useEffect(() => {
     const getPatents = async () => {
-      if (debouncedSearchQuery.length === 0 || debouncedSearchQuery.length >= 3) {
-        setLoading(true);
-        setError(null);
-        try {
-          const data = await fetchPatents(debouncedSearchQuery);
-          setPatents(data);
-          setPage(1);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchPatents();
+        setPatents(data);
+        setPage(1);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-
-    getPatents();
+  
+    if (debouncedSearchQuery.length === 0) {
+      getPatents();
+    }
   }, [debouncedSearchQuery, setLoading, setError, setPatents, setPage]);
 
   useEffect(() => {
