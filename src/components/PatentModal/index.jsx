@@ -4,6 +4,10 @@ import { modalStyles } from './styles';
 const PatentModal = ({ patent, open, onClose }) => {
   if (!patent) return null;
 
+  const getInventorNames = (inventors) => {
+    return inventors.map(inv => `${inv.inventor_first_name} ${inv.inventor_last_name}`).join(', ') || 'Não disponível';
+  };
+
   return (
     <Modal 
       open={open} 
@@ -28,14 +32,14 @@ const PatentModal = ({ patent, open, onClose }) => {
         <Box sx={modalStyles.section}>
           <Typography sx={modalStyles.label}>Inventores</Typography>
           <Typography>
-            {patent.inventors?.map(inv => inv.inventor_name).join(', ') || 'Não disponível'}
+            {getInventorNames(patent.inventors)}
           </Typography>
         </Box>
 
         <Box sx={modalStyles.section}>
           <Typography sx={modalStyles.label}>Resumo</Typography>
           <Typography>
-            {patent.abstract || 'Resumo não disponível'}
+            {patent.patent_abstract || 'Resumo não disponível'}
           </Typography>
         </Box>
       </Box>
