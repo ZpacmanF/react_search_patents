@@ -13,7 +13,7 @@ const SearchBar = () => {
   return (
     <TextField
       fullWidth
-      label="Pesquisar patentes"
+      label="Search Patents"
       variant="outlined"
       value={searchQuery}
       onChange={handleSearchChange}
