@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/react_patent_catalog/'
+  base: '/react_search_patents/'
 });
