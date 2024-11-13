@@ -3,36 +3,37 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#1B3F8B',
+      light: '#435EA3',
+      dark: '#122C61',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#626879',
+      light: '#7D8293',
+      dark: '#4A4F5C',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#F5F7FA',
+      paper: '#FFFFFF',
     },
   },
-  typography: {
-    fontFamily: [
-      'Inter',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      'Segoe UI',
-      'Roboto',
-      'Oxygen',
-      'Ubuntu',
-      'Cantarell',
-      'Fira Sans',
-      'Droid Sans',
-      'Helvetica Neue',
-      'sans-serif',
-    ].join(','),
-  },
   components: {
-    MuiCard: {
+    MuiAppBar: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          backgroundColor: '#1B3F8B',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: '#FFFFFF',
+            '&:hover fieldset': {
+              borderColor: '#1B3F8B',
+            },
+          },
         },
       },
     },
