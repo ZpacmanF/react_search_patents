@@ -1,12 +1,8 @@
-import { Modal, Box, Typography } from '@mui/material';
-import { modalStyles } from './styles';
+import { Modal, Box, Typography, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PatentModal = ({ patent, open, onClose }) => {
   if (!patent) return null;
-
-  const getInventorNames = (inventors) => {
-    return inventors.map(inv => `${inv.inventor_first_name} ${inv.inventor_last_name}`).join(', ') || 'Not Found';
-  };
 
   return (
     <Modal 
@@ -14,34 +10,67 @@ const PatentModal = ({ patent, open, onClose }) => {
       onClose={onClose}
       aria-labelledby="patent-modal-title"
     >
-      <Box sx={modalStyles.modal}>
-        <Typography id="patent-modal-title" variant="h5" sx={modalStyles.title}>
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: { xs: '90%', sm: 600 },
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
+        borderRadius: 2,
+        maxHeight: '90vh',
+        overflow: 'auto'
+      }}>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+
+        <Typography id="patent-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
           {patent.patent_title}
         </Typography>
         
-        <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Patent ID</Typography>
-          <Typography>{patent.patent_id}</Typography>
-        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          ID: {patent.patent_id}
+        </Typography>
         
-        <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Date</Typography>
-          <Typography>{patent.patent_date}</Typography>
-        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Data: {patent.patent_date}
+        </Typography>
 
-        <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Inventors</Typography>
-          <Typography>
-            {getInventorNames(patent.inventors)}
-          </Typography>
-        </Box>
+        {patent.patent_abstract && (
+          <>
+            <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: 'bold' }}>
+              Resumo
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {patent.patent_abstract}
+            </Typography>
+          </>
+        )}
 
-        <Box sx={modalStyles.section}>
-          <Typography sx={modalStyles.label}>Abstract</Typography>
-          <Typography>
-            {patent.patent_abstract || 'Abstract not available'}
-          </Typography>
-        </Box>
+        {patent.inventors && patent.inventors.length > 0 && (
+          <>
+            <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: 'bold' }}>
+              Inventores
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {patent.inventors.map(inv => 
+                `${inv.inventor_first_name} ${inv.inventor_last_name}`
+              ).join(', ')}
+            </Typography>
+          </>
+        )}
       </Box>
     </Modal>
   );
