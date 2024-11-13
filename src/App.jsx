@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   Container, 
   AppBar, 
@@ -28,6 +28,8 @@ const PatentCatalog = () => {
     searchQuery
   } = usePatentContext();
 
+  const [recentPatents, setRecentPatents] = useState([]);
+
   const filteredPatents = usePatentSearch();
 
   console.log('Filtered Patents:', filteredPatents);
@@ -42,6 +44,9 @@ const PatentCatalog = () => {
         const data = await fetchPatents(searchQuery);
         console.log('Fetched data:', data);
         setPatents(data);
+        if (!searchQuery) {
+          setRecentPatents(data);
+        }
       } catch (err) {
         console.error('Fetch error:', err);
         setError(err.message);
@@ -69,7 +74,7 @@ const PatentCatalog = () => {
       </AppBar>
 
       <Container sx={{ mt: 4 }}>
-        <SearchBar />
+        <SearchBar recentProducts={recentPatents} />
         
         {error && (
           <Alert severity="error" sx={{ my: 2 }}>

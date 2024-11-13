@@ -12,6 +12,7 @@ const SearchBar = () => {
   const debouncedSearch = useDebounce((value) => {
     if (!value.trim()) {
       setError('The search field cannot be empty.');
+      setSearchQuery(''); 
     } else {
       setError('');
       setSearchQuery(value);
