@@ -1,30 +1,52 @@
-import { TextField } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Box, TextField, InputAdornment, Alert } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { usePatentContext } from '../../context/PatentContext';
-import { searchBarStyles } from './styles';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const SearchBar = () => {
-  const { searchQuery, setSearchQuery } = usePatentContext();
+  const searchRef = useRef('');
+  const { setSearchQuery } = usePatentContext();
+  const [error, setError] = useState('');
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
+  const debouncedSearch = useDebounce((value) => {
+    if (!value.trim()) {
+      setError('The search field cannot be empty.');
+    } else {
+      setError('');
+      setSearchQuery(value);
+    }
+  }, 300);
+
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    searchRef.current = value;
+    debouncedSearch(value);
   };
 
   return (
-    <TextField
-      fullWidth
-      label="Search Patents"
-      variant="outlined"
-      value={searchQuery}
-      onChange={handleSearchChange}
-      sx={searchBarStyles.textField}
-      error={searchQuery.length > 0 && searchQuery.length < 3}
-      helperText={
-        searchQuery.length > 0 && searchQuery.length < 3 
-          ? "Please enter at least 3 characters" 
-          : ""
-      }
-    />
+    <Box sx={{ width: '100%', mb: 3 }}>
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search patents..."
+        onChange={handleSearch}
+        error={!!error}
+        helperText={error}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+    </Box>
   );
 };
 
