@@ -32,10 +32,8 @@ export const PatentProvider = ({ children }) => {
   );
 };
 
+export { PatentContext };
+
 export const usePatentContext = () => {
-  const context = useContext(PatentContext);
-  if (!context) {
-    throw new Error('usePatentContext must be used within a PatentProvider');
-  }
-  return context;
+  return useContext(PatentContext);
 };
